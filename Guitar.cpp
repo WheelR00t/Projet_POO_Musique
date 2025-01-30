@@ -2,7 +2,7 @@
 #include <conio.h>
 #include <iostream>
 
-using namepsace std;
+using namespace std;
 
 Guitar::Guitar() : Instrument("Guitar", "ModelG", "String", true) {}
 
