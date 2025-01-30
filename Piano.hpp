@@ -1,13 +1,15 @@
-#ifndef DEF_PIANO
-#define DEF_PIANO
+#ifndef PIANO_HPP
+#define PIANO_HPP
 
 #include "Instrument.hpp"
-#include <string>
-#include <iostream>
 
-class Piano : public Instrument {        
-    public:
-        void playPedal() const;
+using namespace std;
+
+class Piano : public Instrument {
+public:
+    Piano();
+    void playNotes(string note) override;
+    void simulate() override;
 };
 
 #endif

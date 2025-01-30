@@ -1,30 +1,25 @@
-#ifndef DEF_INSTRUMENT
-#define DEF_INSTRUMENT
+#ifndef INSTRUMENT_HPP
+#define INSTRUMENT_HPP
 
-#include <string>
 #include <iostream>
+#include <string>
 
 using namespace std;
 
 class Instrument {
-    private :
-
-    int position;
+protected:
     string name;
     string model;
     string soundType;
     bool soundBankAvailable;
-    //string typeInstrument;
 
-    public :
+public:
+    Instrument(string name, string model, string soundType, bool soundAvailable);
+    virtual ~Instrument() = default;
 
-    Instrument();
-    ~Instrument();
-
-    void playNotes(string note);
-    void simulate(string nomInstrument);
-    void displayDetails();
-
+    virtual void playNotes(string note) = 0; 
+    virtual void simulate() = 0; 
+    virtual void displayDetails();
 };
 
 #endif

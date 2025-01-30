@@ -1,14 +1,14 @@
 #include "Instrument.cpp"
+#include "Piano.cpp"
+#include "Guitar.cpp"
+#include "Xylophone.cpp"
 
 #include <unordered_map>
 #include <iostream>
-#include <stdio.h>
-#include <stdlib.h>
-#include <memory>
 #include <filesystem>
-#include <algorithm>
 #include <string>
-#include <conio.h>
+#include <memory>
+#include <algorithm>
 #include <fstream>
 #include <thread>
 #include <chrono>
@@ -62,7 +62,7 @@ void readSheetFromFile(const string& filePath) {
 void readSheet() {
     while (true) {
         cout << "Voulez-vous :\n";
-        cout << "1. Lire les partitions par défaut\n";
+        cout << "1. Lire les partitions par defaut\n";
         cout << "2. Importer une partition\n";
         cout << "3. Retour\n";
         cout << "Votre choix : ";
@@ -76,7 +76,7 @@ void readSheet() {
             const string directory = "ressources/sheets";
             listAvailableSheets(directory);
 
-            cout << "Entrez le nom du fichier (avec extension) à lire parmi les fichiers listés : ";
+            cout << "Entrez le nom du fichier (avec extension) à lire parmi les fichiers listes : ";
             string fileName;
             cin >> fileName;
 
@@ -88,7 +88,7 @@ void readSheet() {
         } else if (choice == 3) {
             break;
         } else {
-            cerr << "Choix invalide. Veuillez réessayer.\n";
+            cerr << "Choix invalide. Veuillez reessayer.\n";
             continue;
         }
 
@@ -105,159 +105,87 @@ void readSheet() {
     }
 }
 
-void createMelody() {
-    string melody;
-    cout << "Entrez une suite de notes (séparées par un espace, ex : Do Ré Mi Mi Fa) : ";
-    cin.ignore();
-    getline(cin, melody);
-
-    const string outputDir = "ressources/userSheets";
-    const string outputPath = outputDir + "/MaPartition.txt";
-    filesystem::create_directories(outputDir);
-
-    ofstream outFile(outputPath);
-    if (!outFile) {
-        cerr << "Erreur : impossible de créer le fichier " << outputPath << ".\n";
-        return;
-    }
-
-    outFile << melody;
-    outFile.close();
-
-    cout << "La mélodie a été enregistrée avec succès dans le fichier : " << outputPath << "\n";
-}*/
-
-void jouerNotes() {
-    cout << "Souhaitez-vous essayer virtuellement l'instrument ? (o/n) : ";
-    char choix;
-    cin >> choix;
-    if (choix == 'o' || choix == 'O') {
-        string model = "Technica Llyit Shouldbefine II";
-        cout << "Vous êtes actuellement en train de simuler le modèle : " << model << "\n";
-        cout << "Appuyez sur les touches suivantes pour jouer des notes:\n";
-        cout << "A - Do    Z - Ré  E - Mi  R - Fa  T - Sol Y - La  U - Si\nAppuyez sur 'Q' pour quitter.\n";
-
-        while (true) {
-            if (_kbhit()) {
-                char touche = _getch();
-                if (touche == 'q' || touche == 'Q') {
-                    cout << "Vous avez quitté l'essai de l'instrument.\n";
-                    break;
-                }
-
-                switch (touche) {
-                    case 'a':
-                        cout << "Do\n";
-                        break;
-                    case 'z':
-                        cout << "Ré\n";
-                        break;
-                    case 'e':
-                        cout << "Mi\n";
-                        break;
-                    case 'r':
-                        cout << "Fa\n";
-                        break;
-                    case 't':
-                        cout << "Sol\n";
-                        break;
-                    case 'y':
-                        cout << "La\n";
-                        break;
-                    case 'u':
-                        cout << "Si\n";
-                        break;
-                    default:
-                        cout << "Touche non associée à une note.\n";
-                        break;
-                }
-            }
-        }
-    }
+unique_ptr<Instrument> createInstrument(const string& name) {
+    if (name == "piano") return make_unique<Piano>();
+    if (name == "guitare") return make_unique<Guitar>();
+    if (name == "xylophone") return make_unique<Xylophone>();
+    return nullptr;
 }
 
-int selectAction(const string& instrument) {
-    int actionChoice;
-    cout << "==================================================\n";
-    cout << "Vous avez sélectionné l'instrument : " << instrument << "\n";
-    cout << "Que souhaitez-vous faire ?\n";
-    cout << "1. Essayer virtuellement l'instrument\n";
-    cout << "2. Lire une partition\n";
-    cout << "3. Créer une mélodie (à venir)\n";
-    cout << "4. Consulter notre catalogue en ligne\n";
-    cout << "5. Choisir un autre instrument\n";
-    cout << "==================================================\n";
-    cin >> actionChoice;
-    return actionChoice;
-}
-
-string getInstrument(const unordered_map<string, string>& instruments) {
-    cout << "Veuillez sélectionner un type d'instrument à essayer virtuellement\n";
+string selectInstrument(const unordered_map<string, string>& instruments) {
+    cout << "Veuillez selectionner un type d'instrument a essayer virtuellement\n";
     
     int index = 1;
-    unordered_map<string, string> numToInstrument; // Map temporaire pour relier numéros et noms
+    unordered_map<string, string> numToInstrument;
+    unordered_map<string, string> nameToInstrument;
     for (const auto& pair : instruments) {
-        if (pair.first == "0" || pair.first == "quitter") continue; // Ignorer l'option de quitter ici
-        if (isdigit(pair.first[0])) continue; // Ignorer les doublons liés aux chiffres déjà définis
+        if (pair.first == "0" || pair.second == "quitter") continue;
         numToInstrument[to_string(index)] = pair.second;
+        nameToInstrument[pair.second] = pair.second;
         cout << index << ". " << pair.second << "\n";
         ++index;
     }
 
     cout << "0. Quitter l'application\n";
     cout << "==================================================\n";
-    cout << "Entrez le chiffre ou le nom de l'instrument à essayer : ";
+    cout << "Entrez le chiffre ou le nom de l'instrument : ";
     
     string input;
     cin >> input;
-
-    // Ignore la casse et vérifie dans le map temporaire des numéros
     transform(input.begin(), input.end(), input.begin(), ::tolower);
+    
     if (numToInstrument.find(input) != numToInstrument.end()) {
         return numToInstrument[input];
     }
-    
-    if (instruments.find(input) != instruments.end()) {
-        return instruments.at(input);
+    if (nameToInstrument.find(input) != nameToInstrument.end()) {
+        return nameToInstrument[input];
     }
-
-    return "invalide";
+    
+    return "";
 }
 
-int main()
-{
+int main() {
     unordered_map<string, string> instruments = {
-        {"1", "piano"}, {"piano", "piano"},
-        {"2", "xylophone"}, {"xylophone", "xylophone"},
-        {"3", "guitare"}, {"guitare", "guitare"},
-        {"0", "quitter"}, {"quitter", "quitter"}
+        {"1", "piano"}, {"2", "xylophone"}, {"3", "guitare"}, {"0", "quitter"}
     };
 
     cout << "==================================================\n";
     cout << "Bienvenue dans l'outil interactif de MusicaLau\n";    
     
     while (true) {
-        string instrument = getInstrument(instruments);
-        //Instrument piano, guitare;
-
-        if (instrument == "quitter") {
+        string chosenInstrument = selectInstrument(instruments);
+        if (chosenInstrument.empty() || chosenInstrument == "quitter") {
             cout << "Sortie de l'application. Merci de votre visite !\n";
             break;
-        } else if (instrument == "invalide") {
-            cout << "Saisie invalide. Veuillez réessayer.\n";
-        } else {
-        
-        int choiceAction = selectAction(instrument);
-        if (choiceAction == 1) {
-                jouerNotes();
-            } else if (choiceAction == 2) {
-                readSheet();
-            } else if (choiceAction == 5) {
-                break;
-            } else if (choiceAction == 3) {
-                //createMelody();
         }
+
+        auto instrument = createInstrument(chosenInstrument);
+        if (!instrument) {
+            cout << "Instrument invalide. Veuillez réessayer.\n";
+            continue;
         }
-    }    
+
+        cout << "==================================================\n";
+        cout << "Vous avez selectionne l'instrument : " << chosenInstrument << "\n";
+        cout << "1. Essayer virtuellement l'instrument\n";
+        cout << "2. Voir les details\n";
+        cout << "3. Lire une partition\n";
+        cout << "4. Choisir un autre instrument\n";
+        cout << "==================================================\n";
+        cout << "Entrez votre choix d'action : ";
+
+        int action;
+        cin >> action;
+
+        if (action == 1) {
+            instrument->simulate();
+        } else if (action == 2) {
+            instrument->displayDetails();
+        } else if (action == 3) {
+            readSheet();
+        } else if (action == 4) {
+            continue;
+        }
+    }
     return 0;
 }
