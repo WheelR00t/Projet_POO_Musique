@@ -2,31 +2,12 @@
 
 using namespace std;
 
-Instrument::Instrument()
-    : position(1), name("Piano"), model("Itshould Work II"), soundType(""), soundBankAvailable(true)
-{
-}
-
-Instrument::~Instrument()
-{
-}
-
-
-void Instrument::playNotes(string note) {
-}
-
-void Instrument::simulate(string nomInstrument) {
-}
+Instrument::Instrument(string name, string model, string soundType, bool soundAvailable)
+    : name(name), model(model), soundType(soundType), soundBankAvailable(soundAvailable) {}
 
 void Instrument::displayDetails() {
-        cout << "Instrument : " << name << endl;;
-        cout << "Modèle : " << model << endl;
-        cout << "Type de son : " << soundType << endl;
-        cout << "Etat de la banque son : ";
-        if (soundBankAvailable == true) {
-            cout << "entièrement disponible" << endl;
-        } else {
-            cout << "non disponible" << endl;
-        }
-        std::cout << endl;
+    cout << "Instrument : " << name << endl;
+    cout << "Modèle : " << model << endl;
+    cout << "Type de son : " << soundType << endl;
+    cout << "État de la banque son : " << (soundBankAvailable ? "Disponible" : "Non disponible") << endl;
 }
